@@ -1,3 +1,10 @@
+let firstNumber = '';
+let currentOperator = null;
+let secondNumber = '';
+let resetScreen = false;
+
+window.addEventListener('keydown', keyboardInput);
+
 function add(a, b) {
   return a + b;
 }
@@ -17,82 +24,112 @@ function divide(a, b) {
   return a / b;
 }
 
-function operate(firstNumber, operator, secondNumber) {
-  firstNumber = Number(firstNumber);
-  secondNumber = Number(secondNumber);
+function operate(first, operator, second) {
+  first = Number(firstNumber);
+  second = Number(secondNumber);
   console.log(firstNumber + " " + operator + " " + secondNumber);
   if (operator === '+') {
-    return add(firstNumber, secondNumber);
+    return add(first, second);
   }
   if (operator === '-') {
-    return subtract(firstNumber, secondNumber);
+    return subtract(first, second);
   }
   if (operator === 'x') {
-    return multiply(firstNumber, secondNumber);
+    return multiply(first, second);
   }
   if (operator === '&divide') {
-    return divide(firstNumber, secondNumber);
+    return divide(first, second);
   }
 }
 
-let firstNumber;
-let operator = '';
-let secondNumber;
+function backSpace() {
+  output.textContent = output.textContent.toString().slice(0, -1);
+}
 
 
-const $input = document.querySelector(".display");
-const BIRTHNUMBER_ALLOWED_CHARS_REGEXP = /[\d+\-/*%]+/;
-$input.addEventListener("keydown", event => {
-  if (!BIRTHNUMBER_ALLOWED_CHARS_REGEXP.test(event.key)) {
-    event.preventDefault();
+const output = document.querySelector('.display');
+
+function reset() {
+  output.textContent = '';
+  resetScreen = false;
+}
+
+function addContent(number) {
+  if (output.textContent === '0' || resetScreen) {
+    reset();
   }
-});
+  output.textContent += number;
+}
 
-// const clear = document.querySelector('.clear');
-// clear.addEventListener('click' , function() {
-//   $input.value = 0;
-// })
+function clear() {
+  output.textContent = '0';
+  firstNumber = '';
+  secondNumber = '';
+  currentOperator = null;
+}
 
-// const sign = document.querySelector('.posorneg');
-// sign.onclick = () => {
-//   $input.value = -1 * $input.value;
-//   console.log($input.value);
-// } 
+function useDecimal() {
+  if (resetScreen) reset();
+  if (output.textContent === '') {
+    output.textContent = '0';
+  } if (output.textContent.includes('.')) return;
+  output.textContent += '.';
+}
 
-// const numbers = document.querySelectorAll('.number');
-// numbers.forEach(number => {
-//   number.addEventListener('click', ((e) => {
-//     $input.value = $input.value + e.target.textContent;
-//   }))
-// })
+function setOperation(operator) {
+  if (currentOperator !== null) evaluate();
+  firstNumber = output.textContent;
+  currentOperator = operator;
+  resetScreen = true;
+}
 
-// const compute = document.querySelectorAll('.compute');
-// compute.forEach(operation => {
-//   operation.addEventListener('click', ((e) => {
-//     if (operator == '') {
-//       firstNumber = $input.value;
-//       operator = e.target.textContent;
-//     } else {
-//       if (isFinite($input.value)) {
-//         $input.value = operate($input.value, e.target.textContent, $input.value);
-//       } else {
-//         $input.value = NaN;
-//       }
-//     }
-//   }))
-// });
+function evaluate() {
+  if (currentOperator === null || resetScreen) return
+  secondNumber = output.textContent;
+  output.textContent = round(operate(firstNumber, currentOperator, secondNumber));
+  currentOperator = null;
+}
 
-// const equal = document.querySelector('.equal');
-// equal.addEventListener('click', (e) => {
-//   console.log(e.target);
-//   let result = operate(firstNumber, operator, $input.value);
-//   console.log(result);
-//   $input.value = result;
-// })
+function round(number) {
+  return Math.round(number * 1000) / 1000;
+}
 
 function compute(e) {
   const value = e.target.textContent;
-  console.log(value);
+  if (value === 'AC') {
+    clear();
+  }
+  else if (value >= '0' && value <= '9') {
+    addContent(value);
+  }
+  else if (value === '+/-') {
+    output.textContent = -1 * output.textContent;
+  }
+  else if (value === '.') {
+    useDecimal();
+  } else if (value === '=') {
+    evaluate();
+  }
+  else {
+    setOperation(value);
+  }
+}
+
+function keyboardInput(e) {
+  if (e.key >= 0 && e.key <= 9) addContent(e.key)
+  if (e.key === '.') useDecimal()
+  if (e.key === '=' || e.key === 'Enter') evaluate()
+  if (e.key === 'Backspace') backSpace()
+  if (e.key === 'Escape') clear()
+  if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/')
+    setOperation(convertOperator(e.key))
+}
+
+function convertOperator(keyboardOperator) {
+  if (keyboardOperator === '/') return '&divide'
+  if (keyboardOperator === '*') return 'x'
+  if (keyboardOperator === '-') return '-'
+  if (keyboardOperator === '+') return '+'
 }
 
 const buttons = document.querySelectorAll('button');
