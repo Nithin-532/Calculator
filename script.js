@@ -41,6 +41,11 @@ function doOperation(firstNumber, currentOperator, secondNumber) {
   }
 }
 
+function removeLast() {
+  if (output.value === '') return;
+  output.value = output.value.slice(0, -1);
+}
+
 const output = document.querySelector('.display');
 
 function reset() {
@@ -128,6 +133,7 @@ function keyboardInput(e) {
   else if (isOperator(e.key)) {
     addOperator(e.key);
   }
+  else if (e.keyCode === 8) removeLast();
   e.preventDefault();
   e.stopPropagation();
 }

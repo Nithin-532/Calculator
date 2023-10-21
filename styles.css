@@ -6,6 +6,7 @@ body {
   align-items: center;
   font-family: Roboto, sans-serif;
   background: linear-gradient(45deg, #0f0015, #8500be);
+  text-align: center;
 }
 
 .calculator {
@@ -42,6 +43,10 @@ button.zero {
   border-radius: 40px;
 }
 
+.first-row button {
+  color: black;
+}
+
 .row button {
   background-color: rgb(87, 87, 87);
   color: white;
@@ -69,4 +74,8 @@ button.equal {
 
 .display::placeholder {
   color: white;
+}
+
+.display:focus {
+  outline: none;
 }
