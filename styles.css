@@ -28,6 +28,7 @@ button {
   border-radius: 50%;
   border: none;
   margin: 3px;
+  padding: 0;
 }
 
 button:hover {
