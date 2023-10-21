@@ -78,6 +78,9 @@ function addDecimal() {
 }
 
 function addOperator(value) {
+  if (currentOperator !== null) {
+    evaluate();
+  }
   firstNumber = output.value;
   currentOperator = value;
   resetScreen = true;
