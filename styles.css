@@ -4,6 +4,7 @@ body {
   height: 100vh;
   justify-content: center;
   align-items: center;
+  font-family: Roboto, sans-serif;
 }
 
 .calculator {
@@ -59,7 +60,11 @@ button.equal {
   color: white;
   display: flex;
   flex-wrap: wrap;
-  justify-content: right;
+  text-align: right;
   background-color: black;
   border: 2px solid white;
+}
+
+.display::placeholder {
+  color: white;
 }

@@ -43,26 +43,30 @@ function operate(first, operator, second) {
 }
 
 function backSpace() {
-  output.textContent = output.textContent.toString().slice(0, -1);
+  output.value = output.value.toString().slice(0, -1);
 }
 
 
 const output = document.querySelector('.display');
 
 function reset() {
-  output.textContent = '';
+  output.value = '';
   resetScreen = false;
 }
 
 function addContent(number) {
-  if (output.textContent === '0' || resetScreen) {
+  if (output.value === '0' || resetScreen) {
     reset();
   }
-  output.textContent += number;
+  if (output.value.length >= 8) {
+    alert("Doesn't have capability for more than 8 number length");
+    return;
+  }
+  output.value += number;
 }
 
 function clear() {
-  output.textContent = '0';
+  output.value = '0';
   firstNumber = '';
   secondNumber = '';
   currentOperator = null;
@@ -70,23 +74,31 @@ function clear() {
 
 function useDecimal() {
   if (resetScreen) reset();
-  if (output.textContent === '') {
-    output.textContent = '0';
-  } if (output.textContent.includes('.')) return;
-  output.textContent += '.';
+  if (output.value === '') {
+    output.value = '0';
+  } if (output.value.includes('.')) return;
+  output.value += '.';
 }
 
 function setOperation(operator) {
   if (currentOperator !== null) evaluate();
-  firstNumber = output.textContent;
+  firstNumber = output.value;
   currentOperator = operator;
   resetScreen = true;
 }
 
 function evaluate() {
   if (currentOperator === null || resetScreen) return
-  secondNumber = output.textContent;
-  output.textContent = round(operate(firstNumber, currentOperator, secondNumber));
+  secondNumber = output.value;
+  let result = round(operate(firstNumber, currentOperator, secondNumber));
+  result = result.toString();
+  if (result.length > 8) {
+    let size = result.length - 1;
+    let first_value = result[0];
+    let second_value = result.slice(1, 5);
+    result = `${first_value}.${second_value}e${size}`;
+  }
+  output.value = result;
   currentOperator = null;
 }
 
@@ -103,7 +115,7 @@ function compute(e) {
     addContent(value);
   }
   else if (value === '+/-') {
-    output.textContent = -1 * output.textContent;
+    output.value = -1 * output.value;
   }
   else if (value === '.') {
     useDecimal();
