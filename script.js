@@ -19,33 +19,27 @@ function multiply(a, b) {
 
 function divide(a, b) {
   if (b == 0) {
+    alert("Hey check the divison(not divided by zero)")
     return NaN;
   }
   return a / b;
 }
 
-function operate(first, operator, second) {
-  first = Number(firstNumber);
-  second = Number(secondNumber);
-  console.log(firstNumber + " " + operator + " " + secondNumber);
-  if (operator === '+') {
+function doOperation(firstNumber, currentOperator, secondNumber) {
+  let first = Number(firstNumber);
+  let second = Number(secondNumber);
+  if (currentOperator === '+') {
     return add(first, second);
   }
-  if (operator === '-') {
+  else if (currentOperator === '-') {
     return subtract(first, second);
   }
-  if (operator === 'x') {
+  else if (currentOperator === 'x') {
     return multiply(first, second);
-  }
-  if (operator === '&divide') {
+  } else {
     return divide(first, second);
   }
 }
-
-function backSpace() {
-  output.value = output.value.toString().slice(0, -1);
-}
-
 
 const output = document.querySelector('.display');
 
@@ -54,51 +48,56 @@ function reset() {
   resetScreen = false;
 }
 
-function addContent(number) {
-  if (output.value === '0' || resetScreen) {
-    reset();
-  }
+function addContent(text) {
+  if (resetScreen) reset();
   if (output.value.length >= 8) {
-    alert("Doesn't have capability for more than 8 number length");
+    alert("Can't handle more than 8 values");
     return;
   }
-  output.value += number;
+  output.value += text;
 }
 
 function clear() {
-  output.value = '0';
+  output.value = '';
   firstNumber = '';
-  secondNumber = '';
   currentOperator = null;
+  secondNumber = '';
+  resetScreen = false;
 }
 
-function useDecimal() {
-  if (resetScreen) reset();
-  if (output.value === '') {
-    output.value = '0';
-  } if (output.value.includes('.')) return;
+function addDecimal() {
+  if (output.value >= 8) {
+    alert("Please try another way as the maximum number length is 8");
+    return;
+  }
+  if (output.value.includes('.')) {
+    alert("Not possible");
+    return;
+  }
   output.value += '.';
 }
 
-function setOperation(operator) {
-  if (currentOperator !== null) evaluate();
+function addOperator(value) {
   firstNumber = output.value;
-  currentOperator = operator;
+  currentOperator = value;
   resetScreen = true;
 }
 
 function evaluate() {
-  if (currentOperator === null || resetScreen) return
-  secondNumber = output.value;
-  let result = round(operate(firstNumber, currentOperator, secondNumber));
+  if (firstNumber === '' || currentOperator === null) {
+    return;
+  }
+  secondNumber = output.value || firstNumber;
+  let result = round(doOperation(firstNumber, currentOperator, secondNumber));
   result = result.toString();
-  if (result.length > 8) {
+  if (result.length >= 8) {
+    let start = result[0];
     let size = result.length - 1;
-    let first_value = result[0];
-    let second_value = result.slice(1, 5);
-    result = `${first_value}.${second_value}e${size}`;
+    let nextNumber = result.slice(1, 5);
+    result = `${start}.${nextNumber}e${size}`;
   }
   output.value = result;
+  resetScreen = true;
   currentOperator = null;
 }
 
@@ -107,41 +106,34 @@ function round(number) {
 }
 
 function compute(e) {
-  const value = e.target.textContent;
-  if (value === 'AC') {
-    clear();
-  }
-  else if (value >= '0' && value <= '9') {
-    addContent(value);
-  }
-  else if (value === '+/-') {
-    output.value = -1 * output.value;
-  }
-  else if (value === '.') {
-    useDecimal();
-  } else if (value === '=') {
-    evaluate();
-  }
+  let value = e.target.textContent;
+  if (value >= '0' && value <= '9') addContent(value);
+  else if (value === 'AC') clear();
+  else if (value === '+/-') output.value = -1 * output.value;
+  else if (value === '.') addDecimal();
+  else if (value === '=') evaluate();
   else {
-    setOperation(value);
+    addOperator(value);
   }
 }
 
 function keyboardInput(e) {
-  if (e.key >= 0 && e.key <= 9) addContent(e.key)
-  if (e.key === '.') useDecimal()
-  if (e.key === '=' || e.key === 'Enter') evaluate()
-  if (e.key === 'Backspace') backSpace()
-  if (e.key === 'Escape') clear()
-  if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/')
-    setOperation(convertOperator(e.key))
+  if (e.key >= 0 && e.key <= 9) addContent(e.key);
+  else if (e.key === '=' || e.key === 'Enter') evaluate();
+  else if (e.key === '.') addDecimal();
+  else if (e.key === 'Escape') clear();
+  else if (isOperator(e.key)) {
+    addOperator(e.key);
+  }
+  e.preventDefault();
+  e.stopPropagation();
 }
 
-function convertOperator(keyboardOperator) {
-  if (keyboardOperator === '/') return '&divide'
-  if (keyboardOperator === '*') return 'x'
-  if (keyboardOperator === '-') return '-'
-  if (keyboardOperator === '+') return '+'
+function isOperator(value) {
+  if (value === '+') return '+';
+  else if (value === '-') return '-';
+  else if (value === '*') return 'x';
+  else if (value === '/') return '&divide';
 }
 
 const buttons = document.querySelectorAll('button');
